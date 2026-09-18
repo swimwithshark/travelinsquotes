@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Insurance Comparison | MSIG / LPI / Allianz </title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--primary);
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+        .branding {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .branding-sub {
+            font-size: 1rem;
+            color: #64748b;
+        }
+        .controls {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+        }
+        select, input[type="number"], input[type="text"], button {
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+            outline: none;
+        }
+        input[type="number"] { width: 80px; }
+        input[type="text"] { width: 160px; }
+        select:focus, input:focus { border-color: var(--accent); }
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            height: 42px;
+        }
+        button:hover { background: #1d4ed8; }
+        .btn-secondary { background: #475569; }
+        .btn-secondary:hover { background: #334155; }
+        #comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); }
+        .card-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .card-header h3 {
+            margin-bottom: 5px;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-body { padding: 20px; }
+        .premium-display {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .group-breakdown {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            min-height: 20px;
+        }
+        .benefit-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+        .benefit-row:last-child { border-bottom: none; }
+        .benefit-label { color: #64748b; font-weight: 500; }
+        .benefit-value { font-weight: 600; text-align: right; color: var(--primary); }
+        
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: help;
+            margin-left: 8px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 260px;
+            background-color: #1e293b;
+            color: #f8fafc;
+            text-align: left;
+            border-radius: 6px;
+            padding: 12px;
+            position: absolute;
+            z-index: 999;
+            bottom: 135%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: normal;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+            line-height: 1.4;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .error-msg {
+            color: #ef4444;
+            text-align: center;
+            grid-column: 1 / -1;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .controls, .btn-secondary { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #cbd5e1; break-inside: avoid; }
+            #comparison-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
+            header { margin-bottom: 20px; }
+            .premium-display { color: #000; }
+            .tooltip { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="branding">MSIG / LPI / Allianz</div>
+        <div class="branding-sub">Travel Insurance Benefit & Premium Comparison</div>
+        <div class="branding-sub" style="margin-top: 5px;">Have a safe journey! </div>
+    </header>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="country">Destination</label>
+            <input type="text" id="country" list="country-list" placeholder="e.g. China, Japan">
+            <datalist id="country-list">
+                <option value="Australia">
+                <option value="China">
+                <option value="Finland">
+                <option value="France">
+                <option value="Hong Kong">
+                <option value="Indonesia">
+                <option value="Japan">
+                <option value="New Zealand">
+                <option value="Singapore">
+                <option value="South Korea">
+                <option value="Switzerland">
+                <option value="Taiwan">
+                <option value="Thailand">
+                <option value="United Kingdom">
+                <option value="United States">
+                <option value="Vietnam">
+            </datalist>
+        </div>
+        <div class="control-group">
+            <label for="days">Days</label>
+            <input type="number" id="days" value="11" min="1" max="180">
+        </div>
+        <div class="control-group" style="margin-left: 10px;">
+            <label for="pax-adult">Adults</label>
+            <input type="number" id="pax-adult" value="1" min="0">
+        </div>
+        <div class="control-group">
+            <label for="pax-senior">Seniors</label>
+            <input type="number" id="pax-senior" value="0" min="0">
+        </div>
+        <div class="control-group">
+            <label for="pax-child">Kids</label>
+            <input type="number" id="pax-child" value="0" min="0">
+        </div>
+        <div class="control-group" style="margin-left: 10px;">
+            <label for="tier">Coverage Tier</label>
+            <select id="tier">
+                <option value="high_tier">High Tier (Platinum/Prestige/Max)</option>
+                <option value="mid_tier">Standard Tier (Gold/Classic/Shield)</option>
+                <option value="basic_tier">Basic Tier (Silver/Classic/Shield)</option>
+            </select>
+        </div>
+        
+        <button onclick="renderComparison()">Calculate</button>
+        <button class="btn-secondary" onclick="exportToPDF()">Export to PDF</button>
+    </div>
+
+    <div id="comparison-grid"></div>
+
+    <footer>
+        *Rates generated based on sum of individual premiums and group discounts (if applicable). Family policies may have different limits.<br>
+        Generated via AugurWP Planner Tool
+    </footer>
+</div>
+
+<script>
+    const countryMap = {
+        "Singapore": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Thailand": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Japan": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "South Korea": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "China": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Australia": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "New Zealand": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Taiwan": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Hong Kong": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Macau": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Vietnam": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Indonesia": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Philippines": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "India": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "Sri Lanka": { lonpac: "area2", allianz: "asia", msig: "area1" },
+        "United Kingdom": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "Switzerland": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "Finland": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "France": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "Germany": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "Italy": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "Europe": { lonpac: "area3", allianz: "ww", msig: "area2" },
+        "United States": { lonpac: "area3", allianz: "ww", msig: "area3" },
+        "Canada": { lonpac: "area3", allianz: "ww", msig: "area3" }
+    };
+    const defaultRegionMap = { lonpac: "area3", allianz: "ww", msig: "area3" };
+
+    const insuranceData = {
+        high_tier: {
+            lonpac: {
+                name: "Lonpac Travel Secure", plan: "Platinum",
+                tooltip: "<strong>Area 2 (Asia):</strong> Singapore, Indonesia, Thailand, Brunei, Philippines, Vietnam, Myanmar, Laos, Cambodia, China, HK, Macau, Taiwan, Korea, Australia, NZ, Japan, India, Bangladesh, Pakistan, Sri Lanka.<br><br><strong>Area 3 (Worldwide):</strong> Worldwide excluding sanctioned countries.",
+                medical: "RM 500,000", death: "RM 500,000", cancellation: "RM 15,000", baggageDelay: "RM 200 / 6 hrs",
+                regions: {
+                    area2: {
+                        bands: [
+                            { max: 5, adult: 53, senior: 64 }, { max: 10, adult: 70, senior: 89 }, { max: 15, adult: 96, senior: 126 },
+                            { max: 20, adult: 120, senior: 162 }, { max: 25, adult: 146, senior: 200 }, { max: 30, adult: 172, senior: 239 },
+                            { max: 35, adult: 202, senior: 283 }
+                        ],
+                        addWk: { adult: 31, senior: 45 }
+                    },
+                    area3: {
+                        bands: [
+                            { max: 5, adult: 64, senior: 101 }, { max: 10, adult: 105, senior: 132 }, { max: 15, adult: 145, senior: 195 },
+                            { max: 20, adult: 189, senior: 281 }, { max: 25, adult: 232, senior: 352 }, { max: 30, adult: 268, senior: 423 },
+                            { max: 35, adult: 316, senior: 505 }
+                        ],
+                        addWk: { adult: 49, senior: 76 }
+                    }
+                }
+            },
+            allianz: {
+                name: "Allianz Travel XPert", plan: "Prestige",
+                tooltip: "<strong>Asia:</strong> Australia, Bangladesh, Brunei, Cambodia, China, HK, India, Indonesia, Japan, Laos, Macau, Maldives, Myanmar, Nepal, NZ, Philippines, Singapore, South Korea, Sri Lanka, Taiwan, Thailand, Vietnam.<br><br><strong>Worldwide:</strong> All countries except Excluded/Sanctioned.<br><br>*Note: Seniors (71-85) default to Classic Tier pricing.",
+                medical: "RM 550,000", death: "RM 750,000", cancellation: "RM 35,000", baggageDelay: "RM 300 / 5 hrs",
+                regions: {
+                    asia: {
+                        bands: [
+                            { max: 5, adult: 89, senior: 189 }, { max: 10, adult: 121, senior: 245 }, { max: 15, adult: 174, senior: 342 },
+                            { max: 22, adult: 243, senior: 472 }, { max: 31, adult: 342, senior: 660 }
+                        ],
+                        addWk: { adult: 45, senior: 82 }
+                    },
+                    ww: {
+                        bands: [
+                            { max: 5, adult: 165, senior: 194 }, { max: 10, adult: 254, senior: 290 }, { max: 15, adult: 358, senior: 387 },
+                            { max: 22, adult: 508, senior: 542 }, { max: 31, adult: 765, senior: 843 }
+                        ],
+                        addWk: { adult: 114, senior: 125 }
+                    }
+                }
+            },
+            msig: {
+                name: "MSIG Travel SafeGuard", plan: "Travel Max",
+                tooltip: "<strong>Area 1 (Asia):</strong> Australia, Brunei, Cambodia, China, HK, India, Indonesia, Japan, South Korea, Laos, Macau, Maldives, Myanmar, NZ, Pakistan, Philippines, Singapore, Sri Lanka, Taiwan, Thailand, Vietnam.<br><br><strong>Area 2:</strong> Europe, Bhutan, Mongolia, Nepal, Tibet, UK, + Area 1.<br><br><strong>Area 3 (Worldwide):</strong> Worldwide excl sanctioned.",
+                medical: "RM 500,000", death: "RM 500,000", cancellation: "RM 30,000", baggageDelay: "RM 200 / 6 hrs",
+                regions: {
+                    area1: {
+                        bands: [
+                            { max: 5, adult: 66, senior: 156 }, { max: 10, adult: 106, senior: 242 },
+                            { max: 18, adult: 164, senior: 374 }, { max: 31, adult: 223, senior: 484 }
+                        ],
+                        addWk: { adult: 47, senior: 116 }
+                    },
+                    area2: {
+                        bands: [
+                            { max: 5, adult: 123, senior: 276 }, { max: 10, adult: 188, senior: 436 },
+                            { max: 18, adult: 280, senior: 654 }, { max: 31, adult: 368, senior: 836 }
+                        ],
+                        addWk: { adult: 90, senior: 208 }
+                    },
+                    area3: {
+                        bands: [
+                            { max: 5, adult: 138, senior: 328 }, { max: 10, adult: 216, senior: 530 },
+                            { max: 18, adult: 326, senior: 806 }, { max: 31, adult: 429, senior: 1037 }
+                        ],
+                        addWk: { adult: 102, senior: 248 }
+                    }
+                }
+            }
+        },
+        mid_tier: {
+            lonpac: {
+                name: "Lonpac Travel Secure", plan: "Gold",
+                tooltip: "<strong>Area 2 (Asia):</strong> Singapore, Indonesia, Thailand, Brunei, Philippines, Vietnam, Myanmar, Laos, Cambodia, China, HK, Macau, Taiwan, Korea, Australia, NZ, Japan, India, Bangladesh, Pakistan, Sri Lanka.<br><br><strong>Area 3 (Worldwide):</strong> Worldwide excluding sanctioned countries.",
+                medical: "RM 400,000", death: "RM 400,000", cancellation: "RM 10,000", baggageDelay: "RM 200 / 6 hrs",
+                regions: {
+                    area2: {
+                        bands: [
+                            { max: 5, adult: 43, senior: 53 }, { max: 10, adult: 57, senior: 76 }, { max: 15, adult: 77, senior: 109 },
+                            { max: 20, adult: 97, senior: 140 }, { max: 25, adult: 118, senior: 174 }, { max: 30, adult: 140, senior: 208 },
+                            { max: 35, adult: 165, senior: 248 }
+                        ],
+                        addWk: { adult: 20, senior: 40 }
+                    },
+                    area3: {
+                        bands: [
+                            { max: 5, adult: 56, senior: 88 }, { max: 10, adult: 88, senior: 147 }, { max: 15, adult: 124, senior: 216 },
+                            { max: 20, adult: 184, senior: 256 }, { max: 25, adult: 226, senior: 322 }, { max: 30, adult: 268, senior: 387 },
+                            { max: 35, adult: 316, senior: 483 }
+                        ],
+                        addWk: { adult: 43, senior: 82 }
+                    }
+                }
+            },
+            allianz: {
+                name: "Allianz Travel XPert", plan: "Classic",
+                tooltip: "<strong>Asia:</strong> Australia, Bangladesh, Brunei, Cambodia, China, HK, India, Indonesia, Japan, Laos, Macau, Maldives, Myanmar, Nepal, NZ, Philippines, Singapore, South Korea, Sri Lanka, Taiwan, Thailand, Vietnam.<br><br><strong>Worldwide:</strong> All countries except Excluded/Sanctioned.",
+                medical: "RM 350,000", death: "RM 500,000", cancellation: "RM 25,000", baggageDelay: "RM 200 / 5 hrs",
+                regions: {
+                    asia: {
+                        bands: [
+                            { max: 5, adult: 74, senior: 189 }, { max: 10, adult: 96, senior: 245 }, { max: 15, adult: 134, senior: 342 },
+                            { max: 22, adult: 185, senior: 472 }, { max: 31, adult: 259, senior: 660 }
+                        ],
+                        addWk: { adult: 32, senior: 82 }
+                    },
+                    ww: {
+                        bands: [
+                            { max: 5, adult: 121, senior: 194 }, { max: 10, adult: 181, senior: 290 }, { max: 15, adult: 242, senior: 387 },
+                            { max: 22, adult: 339, senior: 542 }, { max: 31, adult: 527, senior: 843 }
+                        ],
+                        addWk: { adult: 78, senior: 125 }
+                    }
+                }
+            },
+            msig: {
+                name: "MSIG Travel SafeGuard", plan: "Travel Shield",
+                tooltip: "<strong>Area 1 (Asia):</strong> Australia, Brunei, Cambodia, China, HK, India, Indonesia, Japan, South Korea, Laos, Macau, Maldives, Myanmar, NZ, Pakistan, Philippines, Singapore, Sri Lanka, Taiwan, Thailand, Vietnam.<br><br><strong>Area 2:</strong> Europe, Bhutan, Mongolia, Nepal, Tibet, UK, + Area 1.<br><br><strong>Area 3 (Worldwide):</strong> Worldwide excl sanctioned.",
+                medical: "RM 250,000", death: "RM 300,000", cancellation: "RM 20,000", baggageDelay: "RM 200 / 6 hrs",
+                regions: {
+                    area1: {
+                        bands: [
+                            { max: 5, adult: 53, senior: 111 }, { max: 10, adult: 86, senior: 177 },
+                            { max: 18, adult: 132, senior: 277 }, { max: 31, adult: 178, senior: 359 }
+                        ],
+                        addWk: { adult: 36, senior: 81 }
+                    },
+                    area2: {
+                        bands: [
+                            { max: 5, adult: 98, senior: 201 }, { max: 10, adult: 153, senior: 325 },
+                            { max: 18, adult: 229, senior: 493 }, { max: 31, adult: 299, senior: 631 }
+                        ],
+                        addWk: { adult: 71, senior: 150 }
+                    },
+                    area3: {
+                        bands: [
+                            { max: 5, adult: 111, senior: 242 }, { max: 10, adult: 178, senior: 399 },
+                            { max: 18, adult: 268, senior: 612 }, { max: 31, adult: 352, senior: 789 }
+                        ],
+                        addWk: { adult: 81, senior: 182 }
+                    }
+                }
+            }
+        },
+        basic_tier: {
+            lonpac: {
+                name: "Lonpac Travel Secure", plan: "Silver",
+                tooltip: "<strong>Area 2 (Asia):</strong> Singapore, Indonesia, Thailand, Brunei, Philippines, Vietnam, Myanmar, Laos, Cambodia, China, HK, Macau, Taiwan, Korea, Australia, NZ, Japan, India, Bangladesh, Pakistan, Sri Lanka.<br><br><strong>Area 3 (Worldwide):</strong> Worldwide excluding sanctioned countries.",
+                medical: "RM 200,000", death: "RM 200,000", cancellation: "RM 5,000", baggageDelay: "RM 600 max",
+                regions: {
+                    area2: {
+                        bands: [
+                            { max: 5, adult: 36, senior: 47 }, { max: 10, adult: 47, senior: 67 }, { max: 15, adult: 63, senior: 96 },
+                            { max: 20, adult: 79, senior: 125 }, { max: 25, adult: 97, senior: 155 }, { max: 30, adult: 114, senior: 186 },
+                            { max: 35, adult: 134, senior: 221 }
+                        ],
+                        addWk: { adult: 25, senior: 36 }
+                    },
+                    area3: {
+                        bands: [
+                            { max: 5, adult: 47, senior: 80 }, { max: 10, adult: 77, senior: 121 }, { max: 15, adult: 109, senior: 181 },
+                            { max: 20, adult: 157, senior: 239 }, { max: 25, adult: 194, senior: 302 }, { max: 30, adult: 231, senior: 365 },
+                            { max: 35, adult: 273, senior: 437 }
+                        ],
+                        addWk: { adult: 49, senior: 73 }
+                    }
+                }
+            },
+            allianz: {
+                name: "Allianz Travel XPert", plan: "Classic",
+                tooltip: "<strong>Asia:</strong> Australia, Bangladesh, Brunei, Cambodia, China, HK, India, Indonesia, Japan, Laos, Macau, Maldives, Myanmar, Nepal, NZ, Philippines, Singapore, South Korea, Sri Lanka, Taiwan, Thailand, Vietnam.<br><br><strong>Worldwide:</strong> All countries except Excluded/Sanctioned.<br><br>*Note: Allianz has no Silver tier, defaulting to Classic tier.",
+                medical: "RM 350,000", death: "RM 500,000", cancellation: "RM 25,000", baggageDelay: "RM 200 / 5 hrs",
+                regions: {
+                    asia: {
+                        bands: [
+                            { max: 5, adult: 74, senior: 189 }, { max: 10, adult: 96, senior: 245 }, { max: 15, adult: 134, senior: 342 },
+                            { max: 22, adult: 185, senior: 472 }, { max: 31, adult: 259, senior: 660 }
+                        ],
+                        addWk: { adult: 32, senior: 82 }
+                    },
+                    ww: {
+                        bands: [
+                            { max: 5, adult: 121, senior: 194 }, { max: 10, adult: 181, senior: 290 }, { max: 15, adult: 242, senior: 387 },
+                            { max: 22, adult: 339, senior: 542 }, { max: 31, adult: 527, senior: 843 }
+                        ],
+                        addWk: { adult: 78, senior: 125 }
+                    }
+                }
+            },
+            msig: {
+                name: "MSIG Travel SafeGuard", plan: "Travel Shield",
+                tooltip: "<strong>Area 1 (Asia):</strong> Australia, Brunei, Cambodia, China, HK, India, Indonesia, Japan, South Korea, Laos, Macau, Maldives, Myanmar, NZ, Pakistan, Philippines, Singapore, Sri Lanka, Taiwan, Thailand, Vietnam.<br><br><strong>Area 2:</strong> Europe, Bhutan, Mongolia, Nepal, Tibet, UK, + Area 1.<br><br><strong>Area 3 (Worldwide):</strong> Worldwide excl sanctioned.<br><br>*Note: MSIG has no Silver tier, defaulting to Shield tier.",
+                medical: "RM 250,000", death: "RM 300,000", cancellation: "RM 20,000", baggageDelay: "RM 200 / 6 hrs",
+                regions: {
+                    area1: {
+                        bands: [
+                            { max: 5, adult: 53, senior: 111 }, { max: 10, adult: 86, senior: 177 },
+                            { max: 18, adult: 132, senior: 277 }, { max: 31, adult: 178, senior: 359 }
+                        ],
+                        addWk: { adult: 36, senior: 81 }
+                    },
+                    area2: {
+                        bands: [
+                            { max: 5, adult: 98, senior: 201 }, { max: 10, adult: 153, senior: 325 },
+                            { max: 18, adult: 229, senior: 493 }, { max: 31, adult: 299, senior: 631 }
+                        ],
+                        addWk: { adult: 71, senior: 150 }
+                    },
+                    area3: {
+                        bands: [
+                            { max: 5, adult: 111, senior: 242 }, { max: 10, adult: 178, senior: 399 },
+                            { max: 18, adult: 268, senior: 612 }, { max: 31, adult: 352, senior: 789 }
+                        ],
+                        addWk: { adult: 81, senior: 182 }
+                    }
+                }
+            }
+        }
+    };
+
+    function calculatePremiumForCompany(companyData, regionCode, days) {
+        const regionData = companyData.regions[regionCode];
+        if (!regionData) return { adult: 0, senior: 0, child: 0 };
+
+        let rateObj = null;
+
+        for (let band of regionData.bands) {
+            if (days <= band.max) {
+                rateObj = band;
+                break;
+            }
+        }
+
+        let adultBase = 0, seniorBase = 0;
+
+        if (rateObj) {
+            adultBase = rateObj.adult;
+            seniorBase = rateObj.senior;
+        } else {
+            // Exceeds max band: Base (last band) + Additional Weeks
+            const baseBand = regionData.bands[regionData.bands.length - 1];
+            const extraDays = days - baseBand.max;
+            const extraWeeks = Math.ceil(extraDays / 7);
+
+            adultBase = baseBand.adult + (extraWeeks * regionData.addWk.adult);
+            seniorBase = baseBand.senior + (extraWeeks * regionData.addWk.senior);
+        }
+
+        // Children default to Adult rate for MSIG & Lonpac base calculations (Group Multipliers applied later)
+        return { adult: adultBase, senior: seniorBase, child: adultBase };
+    }
+
+    function renderComparison() {
+        const paxAdult = parseInt(document.getElementById('pax-adult').value) || 0;
+        const paxSenior = parseInt(document.getElementById('pax-senior').value) || 0;
+        const paxChild = parseInt(document.getElementById('pax-child').value) || 0;
+        const totalPax = paxAdult + paxSenior + paxChild;
+        
+        const days = parseInt(document.getElementById('days').value) || 1;
+        const country = document.getElementById('country').value.trim();
+        const tier = document.getElementById('tier').value;
+        const grid = document.getElementById('comparison-grid');
+        
+        if (totalPax === 0) {
+            grid.innerHTML = '<div class="error-msg">Please enter at least 1 traveller.</div>';
+            return;
+        }
+        if (days <= 0) {
+            grid.innerHTML = '<div class="error-msg">Trip duration must be at least 1 day.</div>';
+            return;
+        }
+
+        let regionMapping = defaultRegionMap;
+        for (let key in countryMap) {
+            if (country.toLowerCase().includes(key.toLowerCase())) {
+                regionMapping = countryMap[key];
+                break;
+            }
+        }
+
+        grid.innerHTML = '';
+        const currentData = insuranceData[tier];
+        const companies = ['lonpac', 'allianz', 'msig'];
+
+        companies.forEach(company => {
+            const data = currentData[company];
+            const regionCode = regionMapping[company];
+            const rates = calculatePremiumForCompany(data, regionCode, days);
+            
+            let adultTotal = paxAdult * rates.adult;
+            let seniorTotal = paxSenior * rates.senior;
+            let childTotal = paxChild * rates.child;
+            let discountNote = "";
+
+            // Apply Special Allianz Multipliers
+            if (company === 'allianz') {
+                const groupMultiplier = totalPax >= 5 ? 0.95 : 1;
+                adultTotal = adultTotal * groupMultiplier;
+                seniorTotal = seniorTotal * groupMultiplier;
+                childTotal = childTotal * groupMultiplier * 0.8; // Kids get 20% off
+                if(totalPax >= 5) discountNote = "Includes 5% Group & 20% Child Discount";
+                else if (paxChild > 0) discountNote = "Includes 20% Child Discount";
+            }
+
+            const totalPremium = adultTotal + seniorTotal + childTotal;
+            const regionDisplay = regionCode === 'ww' || regionCode === 'area3' ? "Worldwide" : (regionCode === 'area2' && company === 'msig') ? "Europe/Area 2" : "Asia";
+            
+            const cardHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>
+                            ${data.name}
+                            <span class="tooltip">i
+                                <span class="tooltiptext">${data.tooltip}</span>
+                            </span>
+                        </h3>
+                        <p>Plan: ${data.plan} <br><small>(${regionDisplay} | ${days} Days)</small></p>
+                    </div>
+                    <div class="card-body">
+                        <div class="premium-display">RM ${totalPremium.toFixed(2)}</div>
+                        <div class="group-breakdown">
+                            ${paxAdult} Adult(s), ${paxSenior} Senior(s), ${paxChild} Child(ren)
+                            ${discountNote ? '<br><span style="color:var(--accent)">' + discountNote + '</span>' : ''}
+                        </div>
+                        
+                        <div class="benefit-row">
+                            <span class="benefit-label">Medical Expenses</span>
+                            <span class="benefit-value">${data.medical}</span>
+                        </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">Accidental Death</span>
+                            <span class="benefit-value">${data.death}</span>
+                        </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">Trip Cancellation</span>
+                            <span class="benefit-value">${data.cancellation}</span>
+                        </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">Baggage Delay</span>
+                            <span class="benefit-value">${data.baggageDelay}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += cardHTML;
+        });
+    }
+
+    // Initialize the view
+    renderComparison();
+</script>
+
+</body>
+</html>
